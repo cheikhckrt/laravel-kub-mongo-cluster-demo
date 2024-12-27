@@ -1,0 +1,23 @@
+shard:
+  count: 2 # Nombre de shards
+  replicas: 2 # Nombre de réplicas pour chaque shard
+configsvr:
+  replicas: 2 # Réplicas pour le Config Server
+mongos:
+  replicas: 2 # Nombre d'instances du routeur MongoDB
+auth:
+  enabled: true
+  rootPassword: mongodb-root-password # Mot de passe du root
+  username: myuser 
+  password: mypassword 
+  database: mydatabase 
+persistence:
+  enabled: true # Activer la persistance des données
+  size: 5Gi # Taille du volume persistant
+resources:
+  requests:
+    memory: "512Mi"
+    cpu: "500m"
+  limits:
+    memory: "1Gi"
+    cpu: "1"

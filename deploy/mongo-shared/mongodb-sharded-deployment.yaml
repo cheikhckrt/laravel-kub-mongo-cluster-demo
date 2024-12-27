@@ -1,0 +1,29 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mongodb-sharded-config
+data:
+  values.yaml: |-
+    shard:
+      count: 2 # Nombre de shards
+      replicas: 2 # Réplicas pour chaque shard
+    configsvr:
+      replicas: 2
+    mongos:
+      replicas: 2
+    auth:
+      enabled: true
+      rootPassword: mongodb-root-password
+      username: myuser
+      password: mypassword
+      database: mydatabase
+    persistence:
+      enabled: true
+      size: 5Gi
+    resources:
+      requests:
+        memory: "512Mi"
+        cpu: "500m"
+      limits:
+        memory: "1Gi"
+        cpu: "1"

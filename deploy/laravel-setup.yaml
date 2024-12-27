@@ -1,0 +1,188 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: dev
+  name: laravel
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: laravel
+  template:
+    metadata:
+      labels:
+        app: laravel
+    spec:
+      containers:
+      - name: laravel
+        image: cheikhckrt/custom-laravel:8.2
+        command: ["php", "artisan", "serve", "--host=0.0.0.0", "--port=80"]
+        #command: ["tail", "-f", "/dev/null"]
+        ports:
+        - containerPort: 80
+        volumeMounts:
+        - name: app-code
+          mountPath: /var/www/html
+        envFrom:
+        - configMapRef:
+            name: laravel-config-env
+      volumes:
+      - name: app-code
+        hostPath:
+          path: /home/cba/laravel
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: dev
+  name: laravel-service
+spec:
+  selector:
+    app: laravel
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 80
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  namespace: dev
+  name: mysql-pv
+  labels:
+    app: mysql
+spec:
+  capacity:
+    storage: 1Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: /home/cba/mysqldata # Chemin sur l'hôte où les données seront stockées
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  namespace: dev
+  name: mysql-pv-claim
+  labels:
+    app: mysql
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: dev
+  name: mysql
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mysql
+  template:
+    metadata:
+      labels:
+        app: mysql
+    spec:
+      containers:
+      - name: mysql
+        image: mysql:8.0
+        env:
+        - name: MYSQL_ROOT_PASSWORD
+          value: rootpassword
+        - name: MYSQL_DATABASE
+          value: laravel
+        - name: MYSQL_USER
+          value: laraveluser
+        - name: MYSQL_PASSWORD
+          value: laravelpassword
+        ports:
+        - containerPort: 3306
+        volumeMounts:
+        - name: data-mysql
+          mountPath: /var/lib/mysql # Chemin où MySQL stocke ses données
+      volumes:
+      - name: data-mysql
+        persistentVolumeClaim:
+          claimName: mysql-pv-claim
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: dev
+  name: mysql-service
+spec:
+  selector:
+    app: mysql
+  ports:
+  - protocol: TCP
+    port: 3306
+    targetPort: 3306
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: dev
+  name: mysql-service
+spec:
+  selector:
+    app: mysql
+  ports:
+  - protocol: TCP
+    port: 3306
+    targetPort: 3306
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: dev
+  name: nginx
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nginx
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:latest
+        ports:
+        - containerPort: 80
+        volumeMounts:
+        - name: nginx-config-volume
+          mountPath: /etc/nginx/conf.d/nginx.conf
+          subPath: nginx.conf
+        command:
+        - /bin/sh
+        - -c
+        - |
+          rm -f /etc/nginx/conf.d/default.conf && nginx -g 'daemon off;'
+      volumes:
+      - name: nginx-config-volume
+        configMap:
+          name: nginx-config
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: dev
+  name: nginx-service
+spec:
+  selector:
+    app: nginx
+  # type: LoadBalancer
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 80
+    #nodePort: 30080  # Port d'accès depuis l'hôte (optionnel)
+
