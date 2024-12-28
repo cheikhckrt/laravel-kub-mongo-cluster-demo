@@ -24,8 +24,8 @@ data:
   DB_HOST: "mongodb-sharded"
   DB_PORT: "27017"
   DB_DATABASE: "mydatabase"
-  DB_USERNAME: "myuser"
-  DB_PASSWORD: "mypassword"
+  DB_USERNAME: "root"
+  DB_PASSWORD: "mongodb-root-password"
 
 
   BROADCAST_DRIVER: "log"
