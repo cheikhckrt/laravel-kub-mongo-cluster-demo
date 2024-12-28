@@ -111,7 +111,17 @@ return [
             // 'encrypt' => env('DB_ENCRYPT', 'yes'),
             // 'trust_server_certificate' => env('DB_TRUST_SERVER_CERTIFICATE', 'false'),
         ],
-
+        'mongodb' => [
+            'driver'    => 'mongodb',
+            'host'      => explode(',', env('DB_HOST', '127.0.0.1')),
+            'port'      => env('DB_PORT', 27017),
+            'database'  => env('DB_DATABASE'),
+            'username'  => env('DB_USERNAME'),
+            'password'  => env('DB_PASSWORD'),
+            'options'   => !empty(env('DB_REPLICA_SET')) ? ['replicaSet' => env('DB_REPLICA_SET')] : [],
+            'ssl'       => env('DB_SSL', false),
+            'sslCAFile' => env('DB_SSL_CA_FILE', ''),
+        ],
     ],
 
     /*
