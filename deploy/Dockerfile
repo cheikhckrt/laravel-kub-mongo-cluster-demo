@@ -9,7 +9,6 @@ RUN rm -f /var/log/nginx/access.log && \
     ln -s /dev/stdout /var/log/nginx/error.log && \
     ln -s /dev/stdout /var/log/nginx/access.log
 
-# COPY docker-entrypoint.sh /
 
 RUN docker-php-ext-install bcmath ctype mbstring pdo pdo_mysql xml pcntl sockets
 
@@ -23,5 +22,3 @@ RUN docker-php-ext-install soap \
     && docker-php-ext-enable mongodb
 
 WORKDIR /var/www/html
-
-# ENTRYPOINT [ "/docker-entrypoint.sh" ]

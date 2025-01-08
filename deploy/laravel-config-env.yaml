@@ -9,7 +9,7 @@ data:
   APP_ENV: "local"
   APP_KEY: "base64:VpHyLDkz5iw5tcXzPdJ79RMEqBoQp5+WO+9T3WNqxuY="
   APP_DEBUG: "true"
-  APP_URL: "http://localhost"
+  APP_URL: "http://test.laravel.com"
   LOG_CHANNEL: "null"
   LOG_LEVEL: "debug"
 
